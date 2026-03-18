@@ -1,0 +1,16 @@
+name: anna_analysis
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - ipykernel
+  - pandas
+  - numpy
+  - scipy
+  - matplotlib
+  - seaborn
+  - pip
+  - pip:
+    - pydeseq2

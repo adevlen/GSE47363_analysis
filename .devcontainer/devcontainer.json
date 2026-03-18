@@ -1,0 +1,20 @@
+{
+    "name": "Anna's Analysis Environment",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-toolsai.jupyter"
+            ],
+            "settings": {
+                // point VSCode to environment
+                "python.defaultInterpreterPath": "/opt/conda/envs/anna_analysis/bin/python"
+        }
+    },
+    "postCreateCommand": "conda env create -f environment.yml || conda env update -f environment.yml",
+    "remoteUser": "root"
+    }
+}
