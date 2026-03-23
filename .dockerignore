@@ -1,0 +1,34 @@
+# Git & Metadata 
+.git
+.gitignore
+.github/
+.vscode/
+.devcontainer/
+
+# Python Environment 
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Data & Results
+data/
+results/
+*.gz
+*.tar
+*.zip
+*.csv
+*.tsv
+
+# Jupyter & Notebooks
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# OS Junk
+.DS_Store
+Thumbs.db

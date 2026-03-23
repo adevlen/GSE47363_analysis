@@ -1,20 +1,25 @@
 {
-    "name": "Anna's Analysis Environment",
-    "build": {
-        "dockerfile": "Dockerfile"
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-python.python",
-                "ms-toolsai.jupyter"
-            ],
-            "settings": {
-                // point VSCode to environment
-                "python.defaultInterpreterPath": "/opt/conda/envs/anna_analysis/bin/python"
-        }
-    },
-    "postCreateCommand": "conda env create -f environment.yml || conda env update -f environment.yml",
-    "remoteUser": "root"
+  "name": "Anna's Analysis Environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".." 
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder}/data,target=/work/data,type=bind",
+    "source=${localWorkspaceFolder}/results,target=/work/results,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python", 
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/conda/envs/msse-env/bin/python"
+      }
     }
+  },
+  "postCreateCommand": "conda env create -f environment.yml || conda env update -f environment.yml",
+  "remoteUser": "root",
+  "workspaceFolder": "/work"
 }
