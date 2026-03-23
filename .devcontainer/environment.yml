@@ -13,4 +13,4 @@ dependencies:
   - seaborn
   - pip
   - pip:
-    - pydeseq2
+    - inmoose
