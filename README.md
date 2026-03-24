@@ -2,12 +2,12 @@
 
 **Investigating the transcriptomic impact of miR-542-3p mimics in human cell lines.**
 
-### Project Overview
+## Project Overview
 This repository contains a reproducible pipeline for the differential expression analysis of the GSE47363 dataset. The study compares a miR-542-3p treatment group against a negative control group to identify gene expression changes induced by the miRNA mimic.
 
 The analysis is performed using the limma framework (implemented via InMoose) to handle Illumina microarray intensities.
 
-### Key Features
+## Key Features
 Data Processing: Loading and processing of non-normalized Illumina intensity files.
 
 Gene Deduplication: Utilization of the MaxMean method to handle multiple probes mapping to the same gene symbol.
@@ -16,80 +16,111 @@ Statistical Modeling: Linear modeling and empirical Bayes moderation via limma.
 
 Multiple Testing Correction: Implementation of the Benjamini-Hochberg (BH) procedure to control the False Discovery Rate (FDR).
 
-### Repository Structure
+## Repository Structure
+```text
 ├── .devcontainer/      # Docker & DevContainer configuration
 ├── data/               # (User-created) Input directory for GEO and validation files
-├── notebooks/          # Jupyter notebooks for DE analysis and interpretation
-├── results/            # Output: iPathway Guide files, CDF, and Volcano plots
+├── notebooks/          # Jupyter notebook for DE analysis and interpretation
+├── results/            # Output: iPathway Guide input file, CDF and Volcano plots
 └── README.md
+```
+## Getting Started
 
-### Getting Started
-
-#### Prerequisites
+### Prerequisites
 * Python 3.10+
 * InMoose (for limma implementation)
 * pandas, numpy, and matplotlib/seaborn for visualization
 
-#### Data Acquisition
+### Data Acquisition
 This analysis requires three specific files located in the data/ directory.
 
-1. Expression Data (GSE47363)
-Source: NCBI GEO GSE47363
+**1. Expression Data (GSE47363)**
 
-File: GSE47363_non-normalized.txt.gz
+    Source: NCBI GEO GSE47363
 
-Instructions: Download and extract using gunzip so that data/GSE47363_non-normalized.txt is available.
+    File: GSE47363_non-normalized.txt.gz
 
-2. Platform Annotations (GPL10558)
-Source: GPL10558 - Illumina HumanHT-12 V4.0
+    Instructions: Download and extract so that data/GSE47363_non-normalized.txt is available.
 
-File: GPL10558_annot.txt
+**2. Platform Annotations (GPL10558)**
+    
+    Source: GPL10558 - Illumina HumanHT-12 V4.0
 
-Instructions: This file is used to map Illumina Probe IDs to Gene Symbols. Ensure it is placed in the data/ folder.
+    File: GPL10558_HumanHT-12_V4_0_R1_15002873_B.txt.gz
 
-3. TargetScan Validation (Private)
-Source: Provided for validation (not public).
+    Instructions: Rename to GPL10558_annot.txt. This file is used to map Illumina Probe IDs to Gene Symbols. Ensure it is placed in the data/ folder.
 
-File: targetscan_validation_results.csv
+**3. TargetScan Validation (Private)**
+    
+    Source: Provided for validation (not public).
 
-Instructions: This file contains the predicted targets for miR-542-3p. It must be manually placed in the data/ folder for the validation step of the pipeline to run.
+    File: targetscan_validation_results.csv
 
-#### Installation
+    Instructions: This file contains the predicted targets for miR-542-3p. It must be manually placed in the data/ folder for the validation step of the pipeline to run.
+
+### Installation
 ```bash
 git clone https://github.com/adevlen/GSE47363_analysis.git
 cd /GSE47363_analysis
+cd /.devcontainer
 ```
-#### Development Environment
-This project is configured for easy reproducibility using Docker. You can either use the automated VS Code setup or build the environment manually.
+### Development Environment
+This project is configured for easy reproducibility using Docker. To use the automated VSCode setup:
 
-**Option 1: VS Code DevContainers**
-If you have the Dev Containers extension installed in VS Code:
+1. Install the Extension:
 
-Open the project folder in VS Code.
+    Open VS Code.
 
-When prompted with "Reopen in Container," click Reopen.
+    Go to the Extensions view (Ctrl+Shift+X).
 
-The extension will automatically build the image and install all dependencies (Python, InMoose, etc.).
+    Search for and install Dev Containers by Microsoft.
 
-**Option 2: Manual Docker Build**
-If you prefer using the command line, you can build and run the container manually:
+2. Open the Project:
 
-```bash
-docker build -t gse47363-analysis .
-docker run -it \
-  -v $(pwd)/data:/work/data \
-  -v $(pwd)/results:/work/results \
-  -p 8888:8888 \
-  gse47363-analysis
-```
-### Usage
-To run the analysis from scratch, execute the main processing notebook:
+    Open this project folder in VS Code.
 
-```bash
-jupyter notebook notebooks/analysis.ipynb
-```
+3. Reopen in Container:
 
-### Results
+    A notification should appear in the bottom right: "Folder contains a Dev Container configuration file. Reopen to folder to develop in a container."
+
+    Click Reopen in Container.
+
+    Alternatively: Click the green "Remote" icon in the bottom-left corner and select "Reopen in Container".
+
+4. Select Kernel:
+
+    Once the container finishes building, open notebooks/analysis.ipynb.
+
+    In the top-right corner, ensure "anna_analysis" is selected as the kernel.
+
+## Usage
+To run the analysis from scratch, select "Run All" at the top of the analysis.ipynb notebook.
+
+## Results
 The analysis identifies key downstream targets of miR-542-3p. Summary plots (Volcano and MA plots) can be found in the results/ directory.
 
-### Biological Context
+## Biological Context
+Because miRNAs typically function as translational repressors or by inducing mRNA degradation, a successful mimic treatment should show a characteristic 'downregulated tilt' in the transcriptome. 
+
+![Volcano Plot](results/Volcano_Plot.png)
+
+This can be readily observed in the volcano plot above, where there is a much greater number of blue (downregulated) genes compared to red (upregulated genes) for miR-542-3p compared to the control. The genes in the top left corner of the plot are the most significantly downregulated genes, the top 5 of which are listed in the table below.
+
+| Symbol | log2FC | Adj. P-Value | Biological Function |
+| :---: | :---: | :---: | :---: |
+| **BIRC5** | \-2.99 | 6.21e-10 | Also known as Survivin; inhibitor of apoptosis and regulator of cell division. |
+| **ARPC1A** | \-2.58 | 6.21e-10 | Component of the Arp2/3 complex; regulates actin polymerization and motility. |
+| **PDIA6** | \-2.50 | 6.21e-10 | Protein disulfide isomerase; involved in ER protein folding and stress response. |
+| **TMEM14A** | \-2.25 | 6.50e-10 | Transmembrane protein; involved in stabilizing mitochondrial membrane potential. |
+| **LOC728453** | \-2.76 | 7.30e-10 | Uncharacterized transcript; highly sensitive to miR-542-3p levels. |
+
+Two of the top five downregulated genes, BIRC5 and TMEM14A, are strongly linked to cell survival and apoptosis, meaning that miR-542-3p is likely shutting down survival pathways.
+
+## Global Target Validation
+While the top 5 hits highlight individual biological impacts, a global validation using **TargetScan** predicted targets was also performed to confirm the efficacy of the miR-542-3p mimic. 
+
+A Cumulative Distribution Function (CDF) plot was generated to compare the $log_2$ fold changes of predicted miR-542-3p targets against non-targets. 
+
+![CDF Plot](results/miR-542-3p_TargetScan_Validation.png)
+
+The predicted targets (blue line) show a significant "left-shift" compared to non-targets (gray dashed line). A Kolmogorov-Smirnov (KS) test confirmed that this shift is statistically significant ($p < 0.05$), providing evidence that the mimic is effectively suppressing its intended biological targets across the entire transcriptome.

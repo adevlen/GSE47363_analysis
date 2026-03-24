@@ -1,8 +1,8 @@
 name: anna_analysis
 channels:
-  - conda-forge
-  - bioconda
   - defaults
+  - bioconda
+  - conda-forge
 dependencies:
   - python=3.10
   - ipykernel
