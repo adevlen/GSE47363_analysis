@@ -58,6 +58,16 @@ This analysis requires three specific files located in the data/ directory.
 
     Instructions: This file contains the predicted targets for miR-542-3p. It must be manually placed in the data/ folder for the validation step of the pipeline to run.
 
+**4. TargetScan Master Metadata (For Global Ranking)**
+
+    Source: TargetScan Download Page
+
+    Files: * miR_Family_Info.txt
+
+    Predicted_Targets_Info.default_predictions.txt
+
+    Instructions: Download the "Default Predictions" and "miR Family Info" zip files from TargetScan. Unzip both into the data/ folder. These files allow the pipeline to rank miR-542-3p against all other known miRNA families to ensure the result is not a false positive.
+
 ### Installation
 ```bash
 git clone https://github.com/adevlen/GSE47363_analysis.git
@@ -67,7 +77,7 @@ cd /.devcontainer
 ### Development Environment
 This project is configured for easy reproducibility using Docker. To use the automated VSCode setup:
 
-1. Install the Extension:
+**1. Install the Extension:**
 
     Open VS Code.
 
@@ -75,11 +85,11 @@ This project is configured for easy reproducibility using Docker. To use the aut
 
     Search for and install Dev Containers by Microsoft.
 
-2. Open the Project:
+**2. Open the Project:**
 
     Open this project folder in VS Code.
 
-3. Reopen in Container:
+**3. Reopen in Container:**
 
     A notification should appear in the bottom right: "Folder contains a Dev Container configuration file. Reopen to folder to develop in a container."
 
@@ -87,7 +97,7 @@ This project is configured for easy reproducibility using Docker. To use the aut
 
     Alternatively: Click the green "Remote" icon in the bottom-left corner and select "Reopen in Container".
 
-4. Select Kernel:
+**4. Select Kernel:**
 
     Once the container finishes building, open notebooks/analysis.ipynb.
 
@@ -97,7 +107,7 @@ This project is configured for easy reproducibility using Docker. To use the aut
 To run the analysis from scratch, select "Run All" at the top of the analysis.ipynb notebook.
 
 ## Results
-The analysis identifies key downstream targets of miR-542-3p. Summary plots (Volcano and MA plots) can be found in the results/ directory.
+The analysis identifies key downstream targets of miR-542-3p. Summary plots (Volcano and CDF plots) can be found in the results/ directory.
 
 ## Biological Context
 Because miRNAs typically function as translational repressors or by inducing mRNA degradation, a successful mimic treatment should show a characteristic 'downregulated tilt' in the transcriptome. 
@@ -123,4 +133,16 @@ A Cumulative Distribution Function (CDF) plot was generated to compare the $log_
 
 ![CDF Plot](results/miR-542-3p_TargetScan_Validation.png)
 
-The predicted targets (blue line) show a significant "left-shift" compared to non-targets (gray dashed line). A Kolmogorov-Smirnov (KS) test confirmed that this shift is statistically significant ($p < 0.05$), providing evidence that the mimic is effectively suppressing its intended biological targets across the entire transcriptome.
+The predicted targets (blue line) show a significant "left-shift" compared to non-targets (gray dashed line). A Kolmogorov-Smirnov (KS) test confirmed that this shift is statistically significant ($p < 0.05$), providing evidence that the mimic is effectively suppressing its intended biological targets across the entire transcriptome. 
+
+To confirm that the observed expression changes were specifically driven by miR-542-3p, an unbiased enrichment scan of all miRNA families in the TargetScan database was performed using Master TargetScan files. The Kolmogorov-Smirnov (KS) p-value for every predicted miRNA target set, with miR-542-3p appearing at the top:
+
+| Rank | miRNA Family | p-value | n\_targets |
+| :---: | :---: | :---: | :---: |
+| 1 | miR-542-3p | 6.36E-21 | 331 |
+| 2 | miR-542 | 8.75E-18 | 272 |
+| 3 | miR-15/16/195/497 | 1.88E-07 | 1275 |
+| 4 | miR-34/449 | 5.28E-07 | 749 |
+| 5 | miR-34-5p/449-5p | 1.19E-06 | 736 |
+
+This result confirms that the gene expression changes are directly attributable to the experimental treatment.
