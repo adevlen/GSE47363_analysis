@@ -15,6 +15,6 @@
       }
     }
   },
-  "postCreateCommand": "conda env create -f environment.yml || conda env update -f environment.yml",
+  "postCreateCommand": "conda env create -f .devcontainer/environment.yml || conda env update -f .devcontainer/environment.yml",
   "remoteUser": "root"
 }

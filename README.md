@@ -22,8 +22,11 @@ Multiple Testing Correction: Implementation of the Benjamini-Hochberg (BH) proce
 ├── data/               # (User-created) Input directory for GEO and validation files
 ├── notebooks/          # Jupyter notebook for DE analysis and interpretation
 ├── results/            # Output: iPathway Guide input file, CDF and Volcano plots
+├── scripts/            # analysis.py (converted from notebook)
+├── tests/              # pytest test suite for core pipeline functions
 └── README.md
 ```
+
 ## Getting Started
 
 ### Prerequisites
@@ -36,37 +39,37 @@ This analysis requires three specific files located in the data/ directory.
 
 **1. Expression Data (GSE47363)**
 
-    Source: NCBI GEO GSE47363
+Source: NCBI GEO GSE47363
 
-    File: GSE47363_non-normalized.txt.gz
+File: GSE47363_non-normalized.txt.gz
 
-    Instructions: Download and extract so that data/GSE47363_non-normalized.txt is available.
+Instructions: Download and extract so that data/GSE47363_non-normalized.txt is available.
 
 **2. Platform Annotations (GPL10558)**
     
-    Source: GPL10558 - Illumina HumanHT-12 V4.0
+Source: GPL10558 - Illumina HumanHT-12 V4.0
 
-    File: GPL10558_HumanHT-12_V4_0_R1_15002873_B.txt.gz
+File: GPL10558_HumanHT-12_V4_0_R1_15002873_B.txt.gz
 
-    Instructions: Rename to GPL10558_annot.txt. This file is used to map Illumina Probe IDs to Gene Symbols. Ensure it is placed in the data/ folder.
+Instructions: Rename to GPL10558_annot.txt. This file is used to map Illumina Probe IDs to Gene Symbols. Ensure it is placed in the data/ folder.
 
 **3. TargetScan Validation (Private)**
     
-    Source: Provided for validation (not public).
+Source: Provided for validation (not public).
 
-    File: targetscan_validation_results.csv
+File: targetscan_validation_results.csv
 
-    Instructions: This file contains the predicted targets for miR-542-3p. It must be manually placed in the data/ folder for the validation step of the pipeline to run.
+Instructions: This file contains the predicted targets for miR-542-3p. It must be manually placed in the data/ folder for the validation step of the pipeline to run.
 
 **4. TargetScan Master Metadata (For Global Ranking)**
 
-    Source: TargetScan Download Page
+Source: TargetScan Download Page
 
-    Files: * miR_Family_Info.txt
+Files: 
+* miR_Family_Info.txt
+* Predicted_Targets_Info.default_predictions.txt
 
-    Predicted_Targets_Info.default_predictions.txt
-
-    Instructions: Download the "Default Predictions" and "miR Family Info" zip files from TargetScan. Unzip both into the data/ folder. These files allow the pipeline to rank miR-542-3p against all other known miRNA families to ensure the result is not a false positive.
+Instructions: Download the "Default Predictions" and "miR Family Info" zip files from TargetScan. Unzip both into the data/ folder. These files allow the pipeline to rank miR-542-3p against all other known miRNA families to ensure the result is not a false positive.
 
 ### Installation
 ```bash
@@ -79,32 +82,68 @@ This project is configured for easy reproducibility using Docker. To use the aut
 
 **1. Install the Extension:**
 
-    Open VS Code.
+Open VS Code.
 
-    Go to the Extensions view (Ctrl+Shift+X).
+Go to the Extensions view (Ctrl+Shift+X).
 
-    Search for and install Dev Containers by Microsoft.
+Search for and install Dev Containers by Microsoft.
 
 **2. Open the Project:**
 
-    Open this project folder in VS Code.
+Open this project folder in VS Code.
 
 **3. Reopen in Container:**
 
-    A notification should appear in the bottom right: "Folder contains a Dev Container configuration file. Reopen to folder to develop in a container."
+A notification should appear in the bottom right: "Folder contains a Dev Container configuration file. Reopen to folder to develop in a container."
 
-    Click Reopen in Container.
+Click Reopen in Container.
 
-    Alternatively: Click the green "Remote" icon in the bottom-left corner and select "Reopen in Container".
+Alternatively: Click the green "Remote" icon in the bottom-left corner and select "Reopen in Container".
 
 **4. Select Kernel:**
 
-    Once the container finishes building, open notebooks/analysis.ipynb.
+Once the container finishes building, open notebooks/analysis.ipynb.
 
-    In the top-right corner, ensure "anna_analysis" is selected as the kernel.
+In the top-right corner, ensure "anna_analysis" is selected as the kernel.
 
 ## Usage
 To run the analysis from scratch, select "Run All" at the top of the analysis.ipynb notebook.
+
+## Running the Tests
+
+The test suite validates the core analysis functions in `scripts/analysis.py`.
+
+### Setup
+Ensure the `scripts/` directory exists and the notebook has been converted:
+```bash
+jupyter nbconvert --to script notebooks/analysis.ipynb --output-dir scripts
+```
+
+Also make sure the bottom of `scripts/analysis.py` is wrapped in a guard (if not already):
+```python
+if __name__ == "__main__":
+    ...
+```
+
+### Run the Tests
+From the project root:
+```bash
+pytest tests/test_analysis.py -v
+```
+
+### What's Tested
+The tests cover all core pipeline functions and run without requiring the input data files:
+
+| Function | What's tested |
+| :--- | :--- |
+| `load_data` | File-not-found errors, unrecognized filenames, correct parsing of both file types |
+| `pre_processing` | p-value column removal, column renaming, log2 transformation, detection filter |
+| `drop_duplicates` | Duplicate removal, highest-mean probe selection, no leftover helper columns |
+| `build_design_matrix` | Shape, binary values, one-group-per-sample constraint, correct group counts |
+| `build_constrast_matrix` | Contrast column name, coefficients sum to zero, correct +1/-1 direction |
+| `map_probes_to_genes` | Missing annotation file error, Symbol column presence, unmapped probe removal |
+| `export_for_ipathway` | Output columns, CSV creation, sort order, graceful handling of no output path |
+| `validate_with_targetscan` | KS p-value type and range, correct `is_target` flag assignment |
 
 ## Results
 The analysis identifies key downstream targets of miR-542-3p. Summary plots (Volcano and CDF plots) can be found in the results/ directory.
